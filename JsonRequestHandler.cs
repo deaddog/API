@@ -18,22 +18,22 @@ namespace API
             this.rootURL = rootURL.TrimEnd('/');
         }
 
-        public JObject Request(string url, RequestMethods method, JObject data, bool ignoreError = false)
+        public JObject Request(string url, RequestMethods method, JObject data)
         {
-            return Request(url, method, data.ToString(), ignoreError);
+            return Request(url, method, data.ToString());
         }
-        public JObject Request(string url, RequestMethods method, string data, bool ignoreError = false)
+        public JObject Request(string url, RequestMethods method, string data)
         {
-            byte[] response = getReponse(rootURL + url, method, data, ignoreError);
+            byte[] response = getReponse(rootURL + url, method, data);
 
             if (response != null && response.Length > 0)
                 return JObject.Parse(Encoding.UTF8.GetString(response));
             else
                 return null;
         }
-        public JObject Request(string url, RequestMethods method, bool ignoreError = false)
+        public JObject Request(string url, RequestMethods method)
         {
-            return Request(url, method, (string)null, ignoreError);
+            return Request(url, method, (string)null);
         }
 
         private string getMethodString(RequestMethods method)
@@ -48,7 +48,7 @@ namespace API
                     throw new ArgumentException("Unknown request method.");
             }
         }
-        private byte[] getReponse(string url, RequestMethods method, string data, bool ignoreError)
+        private byte[] getReponse(string url, RequestMethods method, string data)
         {
             byte[] buffer = data == null ? new byte[0] : Encoding.UTF8.GetBytes(data);
             byte[] responseBuffer = new byte[0];
@@ -57,7 +57,7 @@ namespace API
             switch (method)
             {
                 case RequestMethods.GET:
-                    responseBuffer = HandleWebResponse(client, ignoreError);
+                    responseBuffer = HandleWebResponse(client);
                     break;
 
                 case RequestMethods.PUT:
@@ -80,7 +80,7 @@ namespace API
                         throw new WebException(resp, e);
                     }
 
-                    responseBuffer = HandleWebResponse(client, ignoreError);
+                    responseBuffer = HandleWebResponse(client);
 
                     break;
             }
@@ -88,7 +88,7 @@ namespace API
             return responseBuffer;
         }
 
-        private static byte[] HandleWebResponse(HttpWebRequest client, bool ignoreError)
+        private static byte[] HandleWebResponse(HttpWebRequest client)
         {
             byte[] responseBuffer = new byte[0];
             HttpWebResponse response = null;
@@ -98,10 +98,7 @@ namespace API
             }
             catch (WebException e)
             {
-                if (ignoreError)
-                    return null;
-                else
-                    throw e;
+                throw e;
             }
             var g = response.StatusCode;
 
