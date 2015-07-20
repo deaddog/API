@@ -13,9 +13,22 @@ namespace API
     {
         private readonly string rootURL;
 
+        private bool initialized, initializing;
+
         public JsonRequestHandler(string rootURL)
         {
             this.rootURL = rootURL.TrimEnd('/');
+
+            this.initializing = false;
+            this.initialized = false;
+        }
+
+        protected virtual void Initialize()
+        {
+        }
+
+        protected virtual void SignIn(HttpWebRequest request, bool initial)
+        {
         }
 
         public JToken Request(string url, RequestMethods method, JObject data)
@@ -50,10 +63,20 @@ namespace API
         }
         private byte[] getReponse(string url, RequestMethods method, string data)
         {
+            if (!initialized && !initializing)
+            {
+                initializing = true;
+                Initialize();
+                initialized = true;
+                initializing = false;
+            }
+
             byte[] buffer = data == null ? new byte[0] : Encoding.UTF8.GetBytes(data);
             byte[] responseBuffer = new byte[0];
 
             HttpWebRequest client = System.Net.HttpWebRequest.CreateHttp(url);
+            SignIn(client, !initialized);
+
             switch (method)
             {
                 case RequestMethods.GET:
