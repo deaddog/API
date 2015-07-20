@@ -18,20 +18,20 @@ namespace API
             this.rootURL = rootURL.TrimEnd('/');
         }
 
-        public JObject Request(string url, RequestMethods method, JObject data)
+        public JToken Request(string url, RequestMethods method, JObject data)
         {
             return Request(url, method, data.ToString());
         }
-        public JObject Request(string url, RequestMethods method, string data)
+        public JToken Request(string url, RequestMethods method, string data)
         {
             byte[] response = getReponse(rootURL + url, method, data);
 
             if (response != null && response.Length > 0)
-                return JObject.Parse(Encoding.UTF8.GetString(response));
+                return JToken.Parse(Encoding.UTF8.GetString(response));
             else
                 return null;
         }
-        public JObject Request(string url, RequestMethods method)
+        public JToken Request(string url, RequestMethods method)
         {
             return Request(url, method, (string)null);
         }
