@@ -57,7 +57,7 @@ namespace API
             switch (method)
             {
                 case RequestMethods.GET:
-                    responseBuffer = HandleWebResponse(client);
+                    responseBuffer = handleWebResponse(client);
                     break;
 
                 case RequestMethods.PUT:
@@ -80,7 +80,7 @@ namespace API
                         throw new WebException(resp, e);
                     }
 
-                    responseBuffer = HandleWebResponse(client);
+                    responseBuffer = handleWebResponse(client);
 
                     break;
             }
@@ -88,7 +88,7 @@ namespace API
             return responseBuffer;
         }
 
-        private static byte[] HandleWebResponse(HttpWebRequest client)
+        private static byte[] handleWebResponse(HttpWebRequest client)
         {
             byte[] responseBuffer = new byte[0];
             HttpWebResponse response = null;
