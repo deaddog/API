@@ -10,21 +10,21 @@ namespace API
     {
         private readonly string rootURL;
 
-        private bool initialized, initializing;
+        private bool signedIn, signingIn;
 
         public JsonRequestHandler(string rootURL)
         {
             this.rootURL = rootURL.TrimEnd('/');
 
-            this.initializing = false;
-            this.initialized = false;
+            this.signingIn = false;
+            this.signedIn = false;
         }
 
-        protected virtual void Initialize()
+        protected virtual void SignIn()
         {
         }
 
-        protected virtual void SignIn(HttpWebRequest request, bool initial)
+        protected virtual void SetCredentials(HttpWebRequest request)
         {
         }
 
@@ -60,19 +60,20 @@ namespace API
         }
         private byte[] getReponse(string url, RequestMethods method, string data)
         {
-            if (!initialized && !initializing)
+            if (!signedIn && !signingIn)
             {
-                initializing = true;
-                Initialize();
-                initialized = true;
-                initializing = false;
+                signingIn = true;
+                SignIn();
+                signedIn = true;
+                signingIn = false;
             }
 
             byte[] buffer = data == null ? new byte[0] : Encoding.UTF8.GetBytes(data);
             byte[] responseBuffer = new byte[0];
 
             HttpWebRequest client = System.Net.HttpWebRequest.CreateHttp(url);
-            SignIn(client, !initialized);
+            if (signedIn)
+                SetCredentials(client);
 
             switch (method)
             {
