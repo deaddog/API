@@ -62,6 +62,8 @@ namespace API
         {
             switch (type)
             {
+                case ContentTypes.Undefined: return null;
+
                 case ContentTypes.JSON: return "application/json";
                 case ContentTypes.URL_Encoded: return "application/x-www-form-urlencoded";
                 default:
