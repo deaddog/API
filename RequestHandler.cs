@@ -6,13 +6,13 @@ using System.Text;
 
 namespace API
 {
-    public class JsonRequestHandler
+    public class RequestHandler
     {
         private readonly string rootURL;
 
         private bool signedIn, signingIn;
 
-        public JsonRequestHandler(string rootURL)
+        public RequestHandler(string rootURL)
         {
             this.rootURL = rootURL.TrimEnd('/');
 
