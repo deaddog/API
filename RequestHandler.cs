@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -66,6 +67,16 @@ namespace API
             return Request<T>(url, method, ContentTypes.Undefined, (string)null);
         }
 
+
+        protected string RequestString(string url, RequestMethods method, ContentTypes content, string data, out Dictionary<string, string[]> headers)
+        {
+            Dictionary<string, string[]> temp = null;
+            byte[] response = getReponse(rootURL + url, method, content, data, x => temp = headersToDictionary(x));
+            headers = temp;
+
+            return (response == null || response.Length == 0) ? null : Encoding.UTF8.GetString(response);
+        }
+
         private static string getMethodString(RequestMethods method)
         {
             switch (method)
@@ -86,13 +97,21 @@ namespace API
 
                 case ContentTypes.JSON: return "application/json";
                 case ContentTypes.URL_Encoded: return "application/x-www-form-urlencoded";
-                case ContentTypes.XML:return "application/xml";
+                case ContentTypes.XML: return "application/xml";
                 default:
                     throw new ArgumentException("Unknown content type.", nameof(type));
             }
         }
 
-        private byte[] getReponse(string url, RequestMethods method, ContentTypes content, string data)
+        private static System.Collections.Generic.Dictionary<string, string[]> headersToDictionary(WebHeaderCollection headers)
+        {
+            System.Collections.Generic.Dictionary<string, string[]> dict = new System.Collections.Generic.Dictionary<string, string[]>();
+            for (int i = 0; i < headers.Count; i++)
+                dict.Add(headers.Keys[i], headers.GetValues(i));
+            return dict;
+        }
+
+        private byte[] getReponse(string url, RequestMethods method, ContentTypes content, string data, Action<WebHeaderCollection> headerReader = null)
         {
             if (!signedIn && !signingIn)
             {
@@ -127,6 +146,7 @@ namespace API
                     try
                     {
                         HttpWebResponse response = client.GetResponse() as HttpWebResponse;
+                        headerReader?.Invoke(response.Headers);
                     }
                     catch (WebException e)
                     {
