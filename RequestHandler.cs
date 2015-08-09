@@ -35,9 +35,10 @@ namespace API
         public JToken Request(string url, RequestMethods method, ContentTypes content, string data)
         {
             byte[] response = getReponse(rootURL + url, method, content, data);
+            string response_str = (response == null || response.Length == 0) ? null : Encoding.UTF8.GetString(response);
 
-            if (response != null && response.Length > 0)
-                return JToken.Parse(Encoding.UTF8.GetString(response));
+            if (response_str != null)
+                return JToken.Parse(response_str);
             else
                 return null;
         }
