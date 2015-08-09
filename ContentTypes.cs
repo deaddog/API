@@ -10,6 +10,7 @@ namespace API
     {
         Undefined,
         JSON,
+        XML,
         URL_Encoded
     }
 }

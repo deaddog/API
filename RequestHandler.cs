@@ -29,6 +29,10 @@ namespace API
         {
         }
 
+        public T Request<T>(string url, RequestMethods method, XDocument data) where T : class
+        {
+            return Request<T>(url, method, ContentTypes.XML, data.ToString(SaveOptions.DisableFormatting));
+        }
         public T Request<T>(string url, RequestMethods method, JObject data) where T : class
         {
             return Request<T>(url, method, ContentTypes.JSON, data.ToString());
@@ -47,7 +51,7 @@ namespace API
                 else
                     return null;
             }
-            else if(typeof(T) == typeof(XDocument))
+            else if (typeof(T) == typeof(XDocument))
             {
                 if (response_str != null)
                     return XDocument.Parse(response_str) as T;
@@ -82,6 +86,7 @@ namespace API
 
                 case ContentTypes.JSON: return "application/json";
                 case ContentTypes.URL_Encoded: return "application/x-www-form-urlencoded";
+                case ContentTypes.XML:return "application/xml";
                 default:
                     throw new ArgumentException("Unknown content type.", nameof(type));
             }
