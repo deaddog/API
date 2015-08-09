@@ -30,11 +30,11 @@ namespace API
 
         public JToken Request(string url, RequestMethods method, JObject data)
         {
-            return Request(url, method, data.ToString());
+            return Request(url, method, ContentTypes.JSON, data.ToString());
         }
-        public JToken Request(string url, RequestMethods method, string data)
+        public JToken Request(string url, RequestMethods method, ContentTypes content, string data)
         {
-            byte[] response = getReponse(rootURL + url, method, data);
+            byte[] response = getReponse(rootURL + url, method, content, data);
 
             if (response != null && response.Length > 0)
                 return JToken.Parse(Encoding.UTF8.GetString(response));
@@ -43,7 +43,7 @@ namespace API
         }
         public JToken Request(string url, RequestMethods method)
         {
-            return Request(url, method, (string)null);
+            return Request(url, method, ContentTypes.Undefined, (string)null);
         }
 
         private static string getMethodString(RequestMethods method)
@@ -70,7 +70,8 @@ namespace API
                     throw new ArgumentException("Unknown content type.", nameof(type));
             }
         }
-        private byte[] getReponse(string url, RequestMethods method, string data)
+
+        private byte[] getReponse(string url, RequestMethods method, ContentTypes content, string data)
         {
             if (!signedIn && !signingIn)
             {
@@ -96,12 +97,11 @@ namespace API
                 case RequestMethods.PUT:
                 case RequestMethods.POST:
                 case RequestMethods.DELETE:
-                    client.ContentType = "application/json";
+                    client.ContentType = getContentTypeString(content);
                     client.Method = getMethodString(method);
 
-                    var g = client.GetRequestStream();
-
-                    g.Write(buffer, 0, buffer.Length);
+                    using (var g = client.GetRequestStream())
+                        g.Write(buffer, 0, buffer.Length);
 
                     try
                     {
