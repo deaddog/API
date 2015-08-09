@@ -46,7 +46,7 @@ namespace API
             return Request(url, method, (string)null);
         }
 
-        private string getMethodString(RequestMethods method)
+        private static string getMethodString(RequestMethods method)
         {
             switch (method)
             {
@@ -55,7 +55,17 @@ namespace API
                 case RequestMethods.POST: return "POST";
                 case RequestMethods.DELETE: return "DELETE";
                 default:
-                    throw new ArgumentException("Unknown request method.");
+                    throw new ArgumentException("Unknown request method.", nameof(method));
+            }
+        }
+        private static string getContentTypeString(ContentTypes type)
+        {
+            switch (type)
+            {
+                case ContentTypes.JSON: return "application/json";
+                case ContentTypes.URL_Encoded: return "application/x-www-form-urlencoded";
+                default:
+                    throw new ArgumentException("Unknown content type.", nameof(type));
             }
         }
         private byte[] getReponse(string url, RequestMethods method, string data)
