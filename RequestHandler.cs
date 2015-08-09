@@ -28,23 +28,30 @@ namespace API
         {
         }
 
-        public JToken Request(string url, RequestMethods method, JObject data)
+        public T Request<T>(string url, RequestMethods method, JObject data) where T : class
         {
-            return Request(url, method, ContentTypes.JSON, data.ToString());
+            return Request<T>(url, method, ContentTypes.JSON, data.ToString());
         }
-        public JToken Request(string url, RequestMethods method, ContentTypes content, string data)
+        public T Request<T>(string url, RequestMethods method, ContentTypes content, string data) where T : class
         {
             byte[] response = getReponse(rootURL + url, method, content, data);
             string response_str = (response == null || response.Length == 0) ? null : Encoding.UTF8.GetString(response);
 
-            if (response_str != null)
-                return JToken.Parse(response_str);
+            if (typeof(T) == typeof(string))
+                return response_str as T;
+            else if (typeof(T) == typeof(JToken))
+            {
+                if (response_str != null)
+                    return JToken.Parse(response_str) as T;
+                else
+                    return null;
+            }
             else
-                return null;
+                throw new InvalidOperationException($"{nameof(Request)} does not support objects of type {typeof(T).Name}.");
         }
-        public JToken Request(string url, RequestMethods method)
+        public T Request<T>(string url, RequestMethods method) where T : class
         {
-            return Request(url, method, ContentTypes.Undefined, (string)null);
+            return Request<T>(url, method, ContentTypes.Undefined, (string)null);
         }
 
         private static string getMethodString(RequestMethods method)
