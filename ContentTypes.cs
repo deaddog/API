@@ -8,6 +8,7 @@ namespace API
 {
     public enum ContentTypes
     {
+        Undefined,
         JSON,
         URL_Encoded
     }
