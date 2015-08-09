@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Xml.Linq;
 
 namespace API
 {
@@ -43,6 +44,13 @@ namespace API
             {
                 if (response_str != null)
                     return JToken.Parse(response_str) as T;
+                else
+                    return null;
+            }
+            else if(typeof(T) == typeof(XDocument))
+            {
+                if (response_str != null)
+                    return XDocument.Parse(response_str) as T;
                 else
                     return null;
             }
