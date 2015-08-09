@@ -158,14 +158,15 @@ namespace API
 
             if (g == HttpStatusCode.OK || g == HttpStatusCode.Created)
             {
-                MemoryStream ms = new MemoryStream();
-                response.GetResponseStream().CopyTo(ms);
-                responseBuffer = ms.ToArray();
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    response.GetResponseStream().CopyTo(ms);
+                    responseBuffer = ms.ToArray();
+                }
             }
             else
-            {
                 throw new WebException((response as HttpWebResponse).StatusDescription);
-            }
+
             response.Dispose();
 
             return responseBuffer;
