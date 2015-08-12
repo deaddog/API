@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace API
@@ -30,17 +31,17 @@ namespace API
         {
         }
 
-        public T Request<T>(string url, RequestMethods method, XDocument data) where T : class
+        public async Task<T> Request<T>(string url, RequestMethods method, XDocument data) where T : class
         {
-            return Request<T>(url, method, ContentTypes.XML, data.ToString(SaveOptions.DisableFormatting));
+            return await Request<T>(url, method, ContentTypes.XML, data.ToString(SaveOptions.DisableFormatting));
         }
-        public T Request<T>(string url, RequestMethods method, JObject data) where T : class
+        public async Task<T> Request<T>(string url, RequestMethods method, JObject data) where T : class
         {
-            return Request<T>(url, method, ContentTypes.JSON, data.ToString());
+            return await Request<T>(url, method, ContentTypes.JSON, data.ToString());
         }
-        public T Request<T>(string url, RequestMethods method, ContentTypes content, string data) where T : class
+        public async Task<T> Request<T>(string url, RequestMethods method, ContentTypes content, string data) where T : class
         {
-            byte[] response = getReponse(rootURL + url, method, content, data);
+            byte[] response = await getReponse(rootURL + url, method, content, data);
             string response_str = (response == null || response.Length == 0) ? null : Encoding.UTF8.GetString(response);
 
             if (typeof(T) == typeof(string))
@@ -62,16 +63,16 @@ namespace API
             else
                 throw new InvalidOperationException($"{nameof(Request)} does not support objects of type {typeof(T).Name}.");
         }
-        public T Request<T>(string url, RequestMethods method) where T : class
+        public async Task<T> Request<T>(string url, RequestMethods method) where T : class
         {
-            return Request<T>(url, method, ContentTypes.Undefined, (string)null);
+            return await Request<T>(url, method, ContentTypes.Undefined, (string)null);
         }
 
 
         protected string RequestString(string url, RequestMethods method, ContentTypes content, string data, out Dictionary<string, string[]> headers)
         {
             Dictionary<string, string[]> temp = null;
-            byte[] response = getReponse(rootURL + url, method, content, data, x => temp = headersToDictionary(x));
+            byte[] response = getReponse(rootURL + url, method, content, data, x => temp = headersToDictionary(x)).Result;
             headers = temp;
 
             return (response == null || response.Length == 0) ? null : Encoding.UTF8.GetString(response);
@@ -111,7 +112,7 @@ namespace API
             return dict;
         }
 
-        private byte[] getReponse(string url, RequestMethods method, ContentTypes content, string data, Action<WebHeaderCollection> headerReader = null)
+        private async Task<byte[]> getReponse(string url, RequestMethods method, ContentTypes content, string data, Action<WebHeaderCollection> headerReader = null)
         {
             if (!signedIn && !signingIn)
             {
@@ -140,12 +141,12 @@ namespace API
                     client.ContentType = getContentTypeString(content);
                     client.Method = getMethodString(method);
 
-                    using (var g = client.GetRequestStream())
+                    using (var g = await client.GetRequestStreamAsync())
                         g.Write(buffer, 0, buffer.Length);
 
                     try
                     {
-                        HttpWebResponse response = client.GetResponse() as HttpWebResponse;
+                        HttpWebResponse response = await client.GetResponseAsync() as HttpWebResponse;
                         headerReader?.Invoke(response.Headers);
                     }
                     catch (WebException e)
