@@ -103,9 +103,9 @@ namespace API
             }
         }
 
-        private static System.Collections.Generic.Dictionary<string, string[]> headersToDictionary(WebHeaderCollection headers)
+        private static Dictionary<string, string[]> headersToDictionary(WebHeaderCollection headers)
         {
-            System.Collections.Generic.Dictionary<string, string[]> dict = new System.Collections.Generic.Dictionary<string, string[]>();
+            Dictionary<string, string[]> dict = new Dictionary<string, string[]>();
             for (int i = 0; i < headers.Count; i++)
                 dict.Add(headers.Keys[i], headers.GetValues(i));
             return dict;
@@ -124,7 +124,7 @@ namespace API
             byte[] buffer = data == null ? new byte[0] : Encoding.UTF8.GetBytes(data);
             byte[] responseBuffer = new byte[0];
 
-            HttpWebRequest client = System.Net.HttpWebRequest.CreateHttp(url);
+            HttpWebRequest client = HttpWebRequest.CreateHttp(url);
             if (signedIn)
                 SetCredentials(client);
 
