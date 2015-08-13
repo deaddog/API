@@ -179,7 +179,7 @@ namespace API
         }
         public async Task<T> Request<T>(string url, RequestMethods method, byte[] data, ContentTypes contentType) where T : class
         {
-            byte[] response = await getReponse(rootURL + url, method, contentType, data);
+            byte[] response = await getReponse(url, method, contentType, data);
             string response_str = (response == null || response.Length == 0) ? null : encoding.GetString(response);
 
             if (typeof(T) == typeof(string))
@@ -240,7 +240,7 @@ namespace API
         protected string RequestString(string url, RequestMethods method, ContentTypes content, string data, out Dictionary<string, string[]> headers)
         {
             Dictionary<string, string[]> temp = null;
-            byte[] response = getReponse(rootURL + url, method, content, encoding.GetBytes(data), x => temp = headersToDictionary(x)).Result;
+            byte[] response = getReponse(url, method, content, encoding.GetBytes(data), x => temp = headersToDictionary(x)).Result;
             headers = temp;
 
             return (response == null || response.Length == 0) ? null : encoding.GetString(response);
@@ -282,21 +282,11 @@ namespace API
 
         private async Task<byte[]> getReponse(string url, RequestMethods method, ContentTypes content, byte[] data, Action<WebHeaderCollection> headerReader = null)
         {
-            if (!signedIn && !signingIn)
-            {
-                signingIn = true;
-                SignIn();
-                signedIn = true;
-                signingIn = false;
-            }
+            HttpWebRequest client = CreateRequest(url);
 
             byte[] buffer = data == null ? new byte[0] : data;
             byte[] responseBuffer = new byte[0];
-
-            HttpWebRequest client = HttpWebRequest.CreateHttp(url);
-            if (signedIn)
-                SetCredentials(client);
-
+            
             switch (method)
             {
                 case RequestMethods.GET:
