@@ -61,13 +61,13 @@ namespace API
         {
         }
 
-        public async Task<T> Request<T>(string url, RequestMethods method, XDocument data) where T : class
+        public async Task<T> Request<T>(string url, RequestMethods method, XDocument data, ContentTypes contentType = ContentTypes.XML) where T : class
         {
-            return await Request<T>(url, method, data.ToString(SaveOptions.DisableFormatting), ContentTypes.XML);
+            return await Request<T>(url, method, data.ToString(SaveOptions.DisableFormatting), contentType);
         }
-        public async Task<T> Request<T>(string url, RequestMethods method, JObject data) where T : class
+        public async Task<T> Request<T>(string url, RequestMethods method, JObject data, ContentTypes contentType = ContentTypes.JSON) where T : class
         {
-            return await Request<T>(url, method, data.ToString(Newtonsoft.Json.Formatting.None), ContentTypes.JSON);
+            return await Request<T>(url, method, data.ToString(Newtonsoft.Json.Formatting.None), contentType);
         }
         public async Task<T> Request<T>(string url, RequestMethods method, object data, ContentTypes contentType) where T : class
         {
