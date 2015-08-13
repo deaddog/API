@@ -286,33 +286,7 @@ namespace API
         {
             HttpWebRequest client = await CreateRequest(url, method, data, content);
 
-            byte[] responseBuffer = new byte[0];
-
-            switch (method)
-            {
-                case RequestMethods.GET:
-                    responseBuffer = await handleWebResponse(client);
-                    break;
-
-                case RequestMethods.PUT:
-                case RequestMethods.POST:
-                case RequestMethods.DELETE:
-                    try
-                    {
-                        HttpWebResponse response = await client.GetResponseAsync() as HttpWebResponse;
-                    }
-                    catch (WebException e)
-                    {
-                        var resp = new StreamReader(e.Response.GetResponseStream()).ReadToEnd();
-                        throw new WebException(resp, e);
-                    }
-
-                    responseBuffer = await handleWebResponse(client);
-
-                    break;
-            }
-
-            return responseBuffer;
+            return await handleWebResponse(client);
         }
 
         private static async Task<byte[]> handleWebResponse(HttpWebRequest request)
