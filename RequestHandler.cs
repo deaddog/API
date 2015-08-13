@@ -220,6 +220,13 @@ namespace API
             return await Request<T>(url, method, new byte[0], ContentTypes.Undefined);
         }
 
+
+        public HttpWebRequest CreateRequest(string url, RequestMethods method)
+        {
+            HttpWebRequest request = CreateRequest(url);
+            request.Method = request.Method = getMethodString(method);
+            return request;
+        }
         public HttpWebRequest CreateRequest(string url)
         {
             if (!signedIn && !signingIn)
