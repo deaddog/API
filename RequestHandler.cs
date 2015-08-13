@@ -256,15 +256,6 @@ namespace API
             return request;
         }
 
-        protected string RequestString(string url, RequestMethods method, ContentTypes content, string data, out Dictionary<string, string[]> headers)
-        {
-            Dictionary<string, string[]> temp = null;
-            byte[] response = getReponse(url, method, content, encoding.GetBytes(data), x => temp = headersToDictionary(x)).Result;
-            headers = temp;
-
-            return (response == null || response.Length == 0) ? null : encoding.GetString(response);
-        }
-
         private static string getMethodString(RequestMethods method)
         {
             switch (method)
@@ -291,15 +282,7 @@ namespace API
             }
         }
 
-        private static Dictionary<string, string[]> headersToDictionary(WebHeaderCollection headers)
-        {
-            Dictionary<string, string[]> dict = new Dictionary<string, string[]>();
-            for (int i = 0; i < headers.Count; i++)
-                dict.Add(headers.Keys[i], headers.GetValues(i));
-            return dict;
-        }
-
-        private async Task<byte[]> getReponse(string url, RequestMethods method, ContentTypes content, byte[] data, Action<WebHeaderCollection> headerReader = null)
+        private async Task<byte[]> getReponse(string url, RequestMethods method, ContentTypes content, byte[] data)
         {
             HttpWebRequest client = await CreateRequest(url, method, data, content);
 
@@ -317,7 +300,6 @@ namespace API
                     try
                     {
                         HttpWebResponse response = await client.GetResponseAsync() as HttpWebResponse;
-                        headerReader?.Invoke(response.Headers);
                     }
                     catch (WebException e)
                     {
