@@ -69,6 +69,10 @@ namespace API
         {
             return await Request<T>(url, method, data.ToString(Newtonsoft.Json.Formatting.None), ContentTypes.JSON);
         }
+        public async Task<T> Request<T>(string url, RequestMethods method, object data, ContentTypes contentType) where T : class
+        {
+            return await Request<T>(url, method, data?.ToString(), contentType);
+        }
         public async Task<T> Request<T>(string url, RequestMethods method, string data, ContentTypes contentType) where T : class
         {
             byte[] response = await getReponse(rootURL + url, method, contentType, data);
@@ -109,7 +113,7 @@ namespace API
         }
         public async Task<T> Request<T>(string url, RequestMethods method) where T : class
         {
-            return await Request<T>(url, method, null, ContentTypes.Undefined);
+            return await Request<T>(url, method, (string)null, ContentTypes.Undefined);
         }
 
 
