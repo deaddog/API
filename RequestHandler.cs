@@ -291,7 +291,7 @@ namespace API
             switch (method)
             {
                 case RequestMethods.GET:
-                    responseBuffer = handleWebResponse(client);
+                    responseBuffer = await handleWebResponse(client);
                     break;
 
                 case RequestMethods.PUT:
@@ -307,7 +307,7 @@ namespace API
                         throw new WebException(resp, e);
                     }
 
-                    responseBuffer = handleWebResponse(client);
+                    responseBuffer = await handleWebResponse(client);
 
                     break;
             }
@@ -315,32 +315,20 @@ namespace API
             return responseBuffer;
         }
 
-        private static byte[] handleWebResponse(HttpWebRequest client)
+        private static async Task<byte[]> handleWebResponse(HttpWebRequest request)
         {
             byte[] responseBuffer = new byte[0];
-            HttpWebResponse response = null;
-            try
-            {
-                response = client.GetResponse() as HttpWebResponse;
-            }
-            catch (WebException e)
-            {
-                throw e;
-            }
-            var g = response.StatusCode;
 
-            if (g == HttpStatusCode.OK || g == HttpStatusCode.Created)
-            {
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    response.GetResponseStream().CopyTo(ms);
-                    responseBuffer = ms.ToArray();
-                }
-            }
-            else
-                throw new WebException((response as HttpWebResponse).StatusDescription);
+            using (HttpWebResponse response = await request.GetResponseAsync() as HttpWebResponse)
 
-            response.Dispose();
+                if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Created)
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        await response.GetResponseStream().CopyToAsync(ms);
+                        responseBuffer = ms.ToArray();
+                    }
+                else
+                    throw new WebException((response as HttpWebResponse).StatusDescription);
 
             return responseBuffer;
         }
