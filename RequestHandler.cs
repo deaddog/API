@@ -63,15 +63,15 @@ namespace API
 
         public async Task<T> Request<T>(string url, RequestMethods method, XDocument data) where T : class
         {
-            return await Request<T>(url, method, ContentTypes.XML, data.ToString(SaveOptions.DisableFormatting));
+            return await Request<T>(url, method, data.ToString(SaveOptions.DisableFormatting), ContentTypes.XML);
         }
         public async Task<T> Request<T>(string url, RequestMethods method, JObject data) where T : class
         {
-            return await Request<T>(url, method, ContentTypes.JSON, data.ToString());
+            return await Request<T>(url, method, data.ToString(Newtonsoft.Json.Formatting.None), ContentTypes.JSON);
         }
-        public async Task<T> Request<T>(string url, RequestMethods method, ContentTypes content, string data) where T : class
+        public async Task<T> Request<T>(string url, RequestMethods method, string data, ContentTypes contentType) where T : class
         {
-            byte[] response = await getReponse(rootURL + url, method, content, data);
+            byte[] response = await getReponse(rootURL + url, method, contentType, data);
             string response_str = (response == null || response.Length == 0) ? null : encoding.GetString(response);
 
             if (typeof(T) == typeof(string))
@@ -109,7 +109,7 @@ namespace API
         }
         public async Task<T> Request<T>(string url, RequestMethods method) where T : class
         {
-            return await Request<T>(url, method, ContentTypes.Undefined, (string)null);
+            return await Request<T>(url, method, null, ContentTypes.Undefined);
         }
 
 
