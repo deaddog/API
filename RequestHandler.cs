@@ -83,6 +83,20 @@ namespace API
                 else
                     return null;
             }
+            else if (typeof(T) == typeof(JArray))
+            {
+                if (response_str != null)
+                    return JArray.Parse(response_str) as T;
+                else
+                    return null;
+            }
+            else if (typeof(T) == typeof(JObject))
+            {
+                if (response_str != null)
+                    return JObject.Parse(response_str) as T;
+                else
+                    return null;
+            }
             else if (typeof(T) == typeof(XDocument))
             {
                 if (response_str != null)
