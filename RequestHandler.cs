@@ -180,6 +180,10 @@ namespace API
         public async Task<T> Request<T>(string url, RequestMethods method, byte[] data, ContentTypes contentType) where T : class
         {
             byte[] response = await getReponse(url, method, contentType, data);
+
+            if (typeof(T) == typeof(byte[]))
+                return response as T;
+
             string response_str = (response == null || response.Length == 0) ? null : encoding.GetString(response);
 
             if (typeof(T) == typeof(string))
