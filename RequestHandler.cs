@@ -77,6 +77,10 @@ namespace API
         {
             return await Request<T>(url, RequestMethods.GET, data, contentType);
         }
+        public async Task<T> Get<T>(string url, byte[] data, ContentTypes contentType) where T : class
+        {
+            return await Request<T>(url, RequestMethods.GET, data, contentType);
+        }
         public async Task<T> Get<T>(string url) where T : class
         {
             return await Request<T>(url, RequestMethods.GET);
@@ -95,6 +99,10 @@ namespace API
             return await Request<T>(url, RequestMethods.PUT, data, contentType);
         }
         public async Task<T> Put<T>(string url, string data, ContentTypes contentType) where T : class
+        {
+            return await Request<T>(url, RequestMethods.PUT, data, contentType);
+        }
+        public async Task<T> Put<T>(string url, byte[] data, ContentTypes contentType) where T : class
         {
             return await Request<T>(url, RequestMethods.PUT, data, contentType);
         }
@@ -119,6 +127,10 @@ namespace API
         {
             return await Request<T>(url, RequestMethods.POST, data, contentType);
         }
+        public async Task<T> Post<T>(string url, byte[] data, ContentTypes contentType) where T : class
+        {
+            return await Request<T>(url, RequestMethods.POST, data, contentType);
+        }
         public async Task<T> Post<T>(string url) where T : class
         {
             return await Request<T>(url, RequestMethods.POST);
@@ -140,6 +152,10 @@ namespace API
         {
             return await Request<T>(url, RequestMethods.DELETE, data, contentType);
         }
+        public async Task<T> Delete<T>(string url, byte[] data, ContentTypes contentType) where T : class
+        {
+            return await Request<T>(url, RequestMethods.DELETE, data, contentType);
+        }
         public async Task<T> Delete<T>(string url) where T : class
         {
             return await Request<T>(url, RequestMethods.DELETE);
@@ -158,6 +174,10 @@ namespace API
             return await Request<T>(url, method, data?.ToString(), contentType);
         }
         public async Task<T> Request<T>(string url, RequestMethods method, string data, ContentTypes contentType) where T : class
+        {
+            return await Request<T>(url, method, encoding.GetBytes(data), contentType);
+        }
+        public async Task<T> Request<T>(string url, RequestMethods method, byte[] data, ContentTypes contentType) where T : class
         {
             byte[] response = await getReponse(rootURL + url, method, contentType, data);
             string response_str = (response == null || response.Length == 0) ? null : encoding.GetString(response);
@@ -203,7 +223,7 @@ namespace API
         protected string RequestString(string url, RequestMethods method, ContentTypes content, string data, out Dictionary<string, string[]> headers)
         {
             Dictionary<string, string[]> temp = null;
-            byte[] response = getReponse(rootURL + url, method, content, data, x => temp = headersToDictionary(x)).Result;
+            byte[] response = getReponse(rootURL + url, method, content, encoding.GetBytes(data), x => temp = headersToDictionary(x)).Result;
             headers = temp;
 
             return (response == null || response.Length == 0) ? null : encoding.GetString(response);
@@ -243,7 +263,7 @@ namespace API
             return dict;
         }
 
-        private async Task<byte[]> getReponse(string url, RequestMethods method, ContentTypes content, string data, Action<WebHeaderCollection> headerReader = null)
+        private async Task<byte[]> getReponse(string url, RequestMethods method, ContentTypes content, byte[] data, Action<WebHeaderCollection> headerReader = null)
         {
             if (!signedIn && !signingIn)
             {
@@ -253,7 +273,7 @@ namespace API
                 signingIn = false;
             }
 
-            byte[] buffer = data == null ? new byte[0] : Encoding.UTF8.GetBytes(data);
+            byte[] buffer = data == null ? new byte[0] : data;
             byte[] responseBuffer = new byte[0];
 
             HttpWebRequest client = HttpWebRequest.CreateHttp(url);
