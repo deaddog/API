@@ -224,7 +224,7 @@ namespace API
 
         public async Task<T> GetResponse<T>(HttpWebRequest request) where T : class
         {
-            byte[] response = await handleWebResponse(request);
+            byte[] response = await readWebResponse(request);
 
             if (typeof(T) == typeof(byte[]))
                 return response as T;
@@ -291,7 +291,7 @@ namespace API
             }
         }
 
-        private static async Task<byte[]> handleWebResponse(HttpWebRequest request)
+        private static async Task<byte[]> readWebResponse(HttpWebRequest request)
         {
             byte[] responseBuffer = new byte[0];
 
