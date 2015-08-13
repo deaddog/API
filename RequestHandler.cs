@@ -53,8 +53,9 @@ namespace API
             set { contentType = value; }
         }
 
-        protected virtual void SignIn()
+        protected virtual Task SignIn()
         {
+            return Task.Delay(0);
         }
 
         protected virtual void SetCredentials(HttpWebRequest request)
@@ -205,32 +206,32 @@ namespace API
         }
         public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, byte[] data, ContentTypes contentType)
         {
-            HttpWebRequest request = CreateRequest(url, method);
+            HttpWebRequest request = await CreateRequest(url, method);
             request.ContentType = getContentTypeString(contentType);
 
             if (data != null && data.Length > 0)
             {
                 if (method == RequestMethods.GET)
                     throw new ArgumentException($"Data cannot be transferred using the {nameof(RequestMethods.GET)} method. Embed data as query string.");
-                
+
                 using (var stream = await request.GetRequestStreamAsync())
                     stream.Write(data, 0, data.Length);
             }
 
             return request;
         }
-        public HttpWebRequest CreateRequest(string url, RequestMethods method)
+        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method)
         {
-            HttpWebRequest request = CreateRequest(url);
+            HttpWebRequest request = await CreateRequest(url);
             request.Method = request.Method = getMethodString(method);
             return request;
         }
-        public HttpWebRequest CreateRequest(string url)
+        public async Task<HttpWebRequest> CreateRequest(string url)
         {
             if (!signedIn && !signingIn)
             {
                 signingIn = true;
-                SignIn();
+                await SignIn();
                 signedIn = true;
                 signingIn = false;
             }
