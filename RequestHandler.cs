@@ -301,11 +301,10 @@ namespace API
 
         private async Task<byte[]> getReponse(string url, RequestMethods method, ContentTypes content, byte[] data, Action<WebHeaderCollection> headerReader = null)
         {
-            HttpWebRequest client = CreateRequest(url);
+            HttpWebRequest client = await CreateRequest(url, method, data, content);
 
-            byte[] buffer = data == null ? new byte[0] : data;
             byte[] responseBuffer = new byte[0];
-            
+
             switch (method)
             {
                 case RequestMethods.GET:
@@ -315,12 +314,6 @@ namespace API
                 case RequestMethods.PUT:
                 case RequestMethods.POST:
                 case RequestMethods.DELETE:
-                    client.ContentType = getContentTypeString(content);
-                    client.Method = getMethodString(method);
-
-                    using (var g = await client.GetRequestStreamAsync())
-                        g.Write(buffer, 0, buffer.Length);
-
                     try
                     {
                         HttpWebResponse response = await client.GetResponseAsync() as HttpWebResponse;
