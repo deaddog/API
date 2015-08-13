@@ -12,15 +12,38 @@ namespace API
     public class RequestHandler
     {
         private readonly string rootURL;
+        private Encoding encoding;
 
         private bool signedIn, signingIn;
 
         public RequestHandler(string rootURL)
+            : this(rootURL, Encoding.UTF8)
         {
+        }
+        public RequestHandler(string rootURL, Encoding encoding)
+        {
+            if (rootURL == null)
+                throw new ArgumentNullException(nameof(rootURL));
+            if (encoding == null)
+                throw new ArgumentNullException(nameof(encoding));
+
             this.rootURL = rootURL.TrimEnd('/');
+            this.encoding = encoding;
 
             this.signingIn = false;
             this.signedIn = false;
+        }
+
+        public Encoding Encoding
+        {
+            get { return encoding; }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value));
+
+                encoding = value;
+            }
         }
 
         protected virtual void SignIn()
@@ -42,7 +65,7 @@ namespace API
         public async Task<T> Request<T>(string url, RequestMethods method, ContentTypes content, string data) where T : class
         {
             byte[] response = await getReponse(rootURL + url, method, content, data);
-            string response_str = (response == null || response.Length == 0) ? null : Encoding.UTF8.GetString(response);
+            string response_str = (response == null || response.Length == 0) ? null : encoding.GetString(response);
 
             if (typeof(T) == typeof(string))
                 return response_str as T;
@@ -75,7 +98,7 @@ namespace API
             byte[] response = getReponse(rootURL + url, method, content, data, x => temp = headersToDictionary(x)).Result;
             headers = temp;
 
-            return (response == null || response.Length == 0) ? null : Encoding.UTF8.GetString(response);
+            return (response == null || response.Length == 0) ? null : encoding.GetString(response);
         }
 
         private static string getMethodString(RequestMethods method)
