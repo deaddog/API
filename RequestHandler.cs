@@ -65,7 +65,7 @@ namespace API
         {
             return await Request<T>(url, method, data.ToString(SaveOptions.DisableFormatting), contentType);
         }
-        public async Task<T> Request<T>(string url, RequestMethods method, JObject data, ContentTypes contentType = ContentTypes.JSON) where T : class
+        public async Task<T> Request<T>(string url, RequestMethods method, JToken data, ContentTypes contentType = ContentTypes.JSON) where T : class
         {
             return await Request<T>(url, method, data.ToString(Newtonsoft.Json.Formatting.None), contentType);
         }
