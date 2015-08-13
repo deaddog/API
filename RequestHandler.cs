@@ -187,6 +187,22 @@ namespace API
             return await Request<T>(url, method, new byte[0], ContentTypes.Undefined);
         }
 
+        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, XDocument data, ContentTypes contentType = ContentTypes.XML)
+        {
+            return await CreateRequest(url, method, data.ToString(SaveOptions.DisableFormatting), contentType);
+        }
+        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, JToken data, ContentTypes contentType = ContentTypes.JSON)
+        {
+            return await CreateRequest(url, method, data.ToString(Newtonsoft.Json.Formatting.None), contentType);
+        }
+        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, object data, ContentTypes contentType)
+        {
+            return await CreateRequest(url, method, data?.ToString(), contentType);
+        }
+        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, string data, ContentTypes contentType)
+        {
+            return await CreateRequest(url, method, data == null ? null : encoding.GetBytes(data), contentType);
+        }
         public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, byte[] data, ContentTypes contentType)
         {
             HttpWebRequest request = CreateRequest(url, method);
