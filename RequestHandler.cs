@@ -175,7 +175,7 @@ namespace API
         }
         public async Task<T> Request<T>(string url, RequestMethods method, string data, ContentTypes contentType) where T : class
         {
-            return await Request<T>(url, method, encoding.GetBytes(data), contentType);
+            return await Request<T>(url, method, data == null ? null : encoding.GetBytes(data), contentType);
         }
         public async Task<T> Request<T>(string url, RequestMethods method, byte[] data, ContentTypes contentType) where T : class
         {
@@ -217,7 +217,7 @@ namespace API
         }
         public async Task<T> Request<T>(string url, RequestMethods method) where T : class
         {
-            return await Request<T>(url, method, (string)null, ContentTypes.Undefined);
+            return await Request<T>(url, method, new byte[0], ContentTypes.Undefined);
         }
 
         protected string RequestString(string url, RequestMethods method, ContentTypes content, string data, out Dictionary<string, string[]> headers)
