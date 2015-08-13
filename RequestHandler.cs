@@ -221,6 +221,18 @@ namespace API
         }
 
 
+        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, byte[] data, ContentTypes contentType)
+        {
+            HttpWebRequest request = CreateRequest(url, method);
+            request.ContentType = getContentTypeString(contentType);
+
+            byte[] buffer = data == null ? new byte[0] : data;
+
+            using (var stream = await request.GetRequestStreamAsync())
+                stream.Write(buffer, 0, buffer.Length);
+
+            return request;
+        }
         public HttpWebRequest CreateRequest(string url, RequestMethods method)
         {
             HttpWebRequest request = CreateRequest(url);
