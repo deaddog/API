@@ -220,6 +220,23 @@ namespace API
             return await Request<T>(url, method, new byte[0], ContentTypes.Undefined);
         }
 
+        public HttpWebRequest CreateRequest(string url)
+        {
+            if (!signedIn && !signingIn)
+            {
+                signingIn = true;
+                SignIn();
+                signedIn = true;
+                signingIn = false;
+            }
+
+            HttpWebRequest request = HttpWebRequest.CreateHttp(rootURL + url);
+            if (signedIn)
+                SetCredentials(request);
+
+            return request;
+        }
+
         protected string RequestString(string url, RequestMethods method, ContentTypes content, string data, out Dictionary<string, string[]> headers)
         {
             Dictionary<string, string[]> temp = null;
