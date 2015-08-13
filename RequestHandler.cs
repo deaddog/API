@@ -13,6 +13,7 @@ namespace API
     {
         private readonly string rootURL;
         private Encoding encoding;
+        private ContentTypes contentType;
 
         private bool signedIn, signingIn;
 
@@ -29,6 +30,7 @@ namespace API
 
             this.rootURL = rootURL.TrimEnd('/');
             this.encoding = encoding;
+            this.contentType = ContentTypes.Undefined;
 
             this.signingIn = false;
             this.signedIn = false;
@@ -44,6 +46,11 @@ namespace API
 
                 encoding = value;
             }
+        }
+        public ContentTypes DefaultContentType
+        {
+            get { return contentType; }
+            set { contentType = value; }
         }
 
         protected virtual void SignIn()
