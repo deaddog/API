@@ -208,10 +208,14 @@ namespace API
             HttpWebRequest request = CreateRequest(url, method);
             request.ContentType = getContentTypeString(contentType);
 
-            byte[] buffer = data == null ? new byte[0] : data;
-
-            using (var stream = await request.GetRequestStreamAsync())
-                stream.Write(buffer, 0, buffer.Length);
+            if (data != null && data.Length > 0)
+            {
+                if (method == RequestMethods.GET)
+                    throw new ArgumentException($"Data cannot be transferred using the {nameof(RequestMethods.GET)} method. Embed data as query string.");
+                
+                using (var stream = await request.GetRequestStreamAsync())
+                    stream.Write(data, 0, data.Length);
+            }
 
             return request;
         }
