@@ -179,7 +179,52 @@ namespace API
         }
         public async Task<T> Request<T>(string url, RequestMethods method, byte[] data, ContentTypes contentType) where T : class
         {
-            byte[] response = await getReponse(url, method, contentType, data);
+            HttpWebRequest request = await CreateRequest(url, method, data, contentType);
+            return await GetResponse<T>(request);
+        }
+        public async Task<T> Request<T>(string url, RequestMethods method) where T : class
+        {
+            return await Request<T>(url, method, new byte[0], ContentTypes.Undefined);
+        }
+
+        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, byte[] data, ContentTypes contentType)
+        {
+            HttpWebRequest request = CreateRequest(url, method);
+            request.ContentType = getContentTypeString(contentType);
+
+            byte[] buffer = data == null ? new byte[0] : data;
+
+            using (var stream = await request.GetRequestStreamAsync())
+                stream.Write(buffer, 0, buffer.Length);
+
+            return request;
+        }
+        public HttpWebRequest CreateRequest(string url, RequestMethods method)
+        {
+            HttpWebRequest request = CreateRequest(url);
+            request.Method = request.Method = getMethodString(method);
+            return request;
+        }
+        public HttpWebRequest CreateRequest(string url)
+        {
+            if (!signedIn && !signingIn)
+            {
+                signingIn = true;
+                SignIn();
+                signedIn = true;
+                signingIn = false;
+            }
+
+            HttpWebRequest request = HttpWebRequest.CreateHttp(rootURL + url);
+            if (signedIn)
+                SetCredentials(request);
+
+            return request;
+        }
+
+        public async Task<T> GetResponse<T>(HttpWebRequest request) where T : class
+        {
+            byte[] response = await handleWebResponse(request);
 
             if (typeof(T) == typeof(byte[]))
                 return response as T;
@@ -217,47 +262,7 @@ namespace API
                     return null;
             }
             else
-                throw new InvalidOperationException($"{nameof(Request)} does not support objects of type {typeof(T).Name}.");
-        }
-        public async Task<T> Request<T>(string url, RequestMethods method) where T : class
-        {
-            return await Request<T>(url, method, new byte[0], ContentTypes.Undefined);
-        }
-
-
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, byte[] data, ContentTypes contentType)
-        {
-            HttpWebRequest request = CreateRequest(url, method);
-            request.ContentType = getContentTypeString(contentType);
-
-            byte[] buffer = data == null ? new byte[0] : data;
-
-            using (var stream = await request.GetRequestStreamAsync())
-                stream.Write(buffer, 0, buffer.Length);
-
-            return request;
-        }
-        public HttpWebRequest CreateRequest(string url, RequestMethods method)
-        {
-            HttpWebRequest request = CreateRequest(url);
-            request.Method = request.Method = getMethodString(method);
-            return request;
-        }
-        public HttpWebRequest CreateRequest(string url)
-        {
-            if (!signedIn && !signingIn)
-            {
-                signingIn = true;
-                SignIn();
-                signedIn = true;
-                signingIn = false;
-            }
-
-            HttpWebRequest request = HttpWebRequest.CreateHttp(rootURL + url);
-            if (signedIn)
-                SetCredentials(request);
-
-            return request;
+                throw new InvalidOperationException($"{nameof(GetResponse)} does not support objects of type {typeof(T).Name}.");
         }
 
         private static string getMethodString(RequestMethods method)
@@ -284,13 +289,6 @@ namespace API
                 default:
                     throw new ArgumentException("Unknown content type.", nameof(type));
             }
-        }
-
-        private async Task<byte[]> getReponse(string url, RequestMethods method, ContentTypes content, byte[] data)
-        {
-            HttpWebRequest client = await CreateRequest(url, method, data, content);
-
-            return await handleWebResponse(client);
         }
 
         private static async Task<byte[]> handleWebResponse(HttpWebRequest request)
