@@ -240,12 +240,17 @@ namespace API
 
         public async Task<T> GetResponse<T>(HttpWebRequest request) where T : class
         {
-            byte[] response = await readWebResponse(request);
+            using (HttpWebResponse response = await request.GetResponseAsync() as HttpWebResponse)
+                return await GetResponse<T>(response);
+        }
+        public async Task<T> GetResponse<T>(HttpWebResponse response) where T : class
+        {
+            byte[] data = await readWebResponse(response);
 
             if (typeof(T) == typeof(byte[]))
-                return response as T;
+                return data as T;
 
-            string response_str = (response == null || response.Length == 0) ? null : encoding.GetString(response);
+            string response_str = (data == null || data.Length == 0) ? null : encoding.GetString(data);
 
             if (typeof(T) == typeof(string))
                 return response_str as T;
@@ -307,20 +312,18 @@ namespace API
             }
         }
 
-        private static async Task<byte[]> readWebResponse(HttpWebRequest request)
+        private static async Task<byte[]> readWebResponse(HttpWebResponse response)
         {
             byte[] responseBuffer = new byte[0];
 
-            using (HttpWebResponse response = await request.GetResponseAsync() as HttpWebResponse)
-
-                if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Created)
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        await response.GetResponseStream().CopyToAsync(ms);
-                        responseBuffer = ms.ToArray();
-                    }
-                else
-                    throw new WebException((response as HttpWebResponse).StatusDescription);
+            if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Created)
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    await response.GetResponseStream().CopyToAsync(ms);
+                    responseBuffer = ms.ToArray();
+                }
+            else
+                throw new WebException((response as HttpWebResponse).StatusDescription);
 
             return responseBuffer;
         }
