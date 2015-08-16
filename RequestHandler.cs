@@ -239,11 +239,25 @@ namespace API
                 signingIn = false;
             }
 
+            if (signedIn)
+                url = applyCredentialsQuery(url);
+
             HttpWebRequest request = HttpWebRequest.CreateHttp(rootURL + url);
             if (signedIn)
                 SetCredentials(request);
 
             return request;
+        }
+
+        private string applyCredentialsQuery(string url)
+        {
+            QueryValues values = new QueryValues();
+            SetCredentials(values);
+            return applyQuery(url, values);
+        }
+        private string applyQuery(string url, QueryValues values)
+        {
+            return url;
         }
 
         public async Task<T> GetResponse<T>(HttpWebRequest request) where T : class
