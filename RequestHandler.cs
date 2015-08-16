@@ -61,6 +61,9 @@ namespace API
         protected virtual void SetCredentials(HttpWebRequest request)
         {
         }
+        protected virtual void SetCredentials(QueryValues query)
+        {
+        }
 
         public async Task<T> Get<T>(string url, XDocument data, ContentTypes contentType = ContentTypes.XML) where T : class
         {
@@ -331,6 +334,30 @@ namespace API
                 throw new WebException((response as HttpWebResponse).StatusDescription);
 
             return responseBuffer;
+        }
+
+        public class QueryValues
+        {
+            private List<KeyValuePair<string, string>> list;
+
+            public QueryValues()
+            {
+                list = new List<KeyValuePair<string, string>>();
+            }
+
+            public void Add(string key, string value)
+            {
+                list.Add(new KeyValuePair<string, string>(key, value));
+            }
+
+            public int Count
+            {
+                get { return list.Count; }
+            }
+            public KeyValuePair<string, string> this[int index]
+            {
+                get { return list[index]; }
+            }
         }
     }
 }
