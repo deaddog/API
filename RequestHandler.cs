@@ -257,6 +257,14 @@ namespace API
         }
         private string applyQuery(string url, QueryValues values)
         {
+            if (values.Count == 0)
+                return url;
+
+            url += url.Contains("?") ? "&" : "?";
+            url += $"{values[0].Key}={values[0].Value}";
+            for (int i = 1; i < values.Count; i++)
+                url += $"&{values[i].Key}={values[1].Value}";
+
             return url;
         }
 
