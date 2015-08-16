@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Xml.Linq;
 
 namespace API
@@ -367,8 +368,14 @@ namespace API
                 list = new List<KeyValuePair<string, string>>();
             }
 
-            public void Add(string key, string value)
+            public void Add(string key, string value, bool encode = true)
             {
+                if (encode)
+                {
+                    key = HttpUtility.UrlEncode(key);
+                    value = HttpUtility.UrlEncode(value);
+                }
+
                 list.Add(new KeyValuePair<string, string>(key, value));
             }
 
