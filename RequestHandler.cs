@@ -70,8 +70,8 @@ namespace API
         {
             return await Request<T>(url, RequestMethods.GET);
         }
-        
-        public async Task<T> Put<T>(string url, object data, ContentTypes contentType) where T : class
+
+        public async Task<T> Put<T>(string url, object data, ContentTypes contentType = ContentTypes.Auto) where T : class
         {
             return await Request<T>(url, RequestMethods.PUT, data, contentType);
         }
@@ -79,8 +79,8 @@ namespace API
         {
             return await Request<T>(url, RequestMethods.PUT);
         }
-        
-        public async Task<T> Post<T>(string url, object data, ContentTypes contentType) where T : class
+
+        public async Task<T> Post<T>(string url, object data, ContentTypes contentType = ContentTypes.Auto) where T : class
         {
             return await Request<T>(url, RequestMethods.POST, data, contentType);
         }
@@ -88,8 +88,8 @@ namespace API
         {
             return await Request<T>(url, RequestMethods.POST);
         }
-        
-        public async Task<T> Delete<T>(string url, object data, ContentTypes contentType) where T : class
+
+        public async Task<T> Delete<T>(string url, object data, ContentTypes contentType = ContentTypes.Auto) where T : class
         {
             return await Request<T>(url, RequestMethods.DELETE, data, contentType);
         }
@@ -97,8 +97,8 @@ namespace API
         {
             return await Request<T>(url, RequestMethods.DELETE);
         }
-        
-        public async Task<T> Request<T>(string url, RequestMethods method, object data, ContentTypes contentType) where T : class
+
+        public async Task<T> Request<T>(string url, RequestMethods method, object data, ContentTypes contentType = ContentTypes.Auto) where T : class
         {
             HttpWebRequest request = await CreateRequest(url, method, data, contentType);
             return await GetResponse<T>(request);
@@ -107,8 +107,8 @@ namespace API
         {
             return await Request<T>(url, method, new byte[0], ContentTypes.Undefined);
         }
-        
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, object data, ContentTypes contentType)
+
+        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, object data, ContentTypes contentType = ContentTypes.Auto)
         {
             HttpWebRequest request = await CreateRequest(url, method);
             request.ContentType = getContentTypeString(contentType);
