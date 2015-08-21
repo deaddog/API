@@ -71,23 +71,23 @@ namespace API
             return await Request<T>(url, RequestMethods.GET);
         }
 
-        public async Task<T> Put<T>(string url, XDocument data, ContentTypes contentType = ContentTypes.XML) where T : class
+        public async Task<T> Put<T>(string url, XDocument data, ContentTypes? contentType = ContentTypes.XML) where T : class
         {
             return await Request<T>(url, RequestMethods.PUT, data, contentType);
         }
-        public async Task<T> Put<T>(string url, JToken data, ContentTypes contentType = ContentTypes.JSON) where T : class
+        public async Task<T> Put<T>(string url, JToken data, ContentTypes? contentType = ContentTypes.JSON) where T : class
         {
             return await Request<T>(url, RequestMethods.PUT, data, contentType);
         }
-        public async Task<T> Put<T>(string url, object data, ContentTypes contentType) where T : class
+        public async Task<T> Put<T>(string url, object data, ContentTypes? contentType = null) where T : class
         {
             return await Request<T>(url, RequestMethods.PUT, data, contentType);
         }
-        public async Task<T> Put<T>(string url, string data, ContentTypes contentType) where T : class
+        public async Task<T> Put<T>(string url, string data, ContentTypes? contentType = null) where T : class
         {
             return await Request<T>(url, RequestMethods.PUT, data, contentType);
         }
-        public async Task<T> Put<T>(string url, byte[] data, ContentTypes contentType) where T : class
+        public async Task<T> Put<T>(string url, byte[] data, ContentTypes? contentType = null) where T : class
         {
             return await Request<T>(url, RequestMethods.PUT, data, contentType);
         }
@@ -96,23 +96,23 @@ namespace API
             return await Request<T>(url, RequestMethods.PUT);
         }
 
-        public async Task<T> Post<T>(string url, XDocument data, ContentTypes contentType = ContentTypes.XML) where T : class
+        public async Task<T> Post<T>(string url, XDocument data, ContentTypes? contentType = ContentTypes.XML) where T : class
         {
             return await Request<T>(url, RequestMethods.POST, data, contentType);
         }
-        public async Task<T> Post<T>(string url, JToken data, ContentTypes contentType = ContentTypes.JSON) where T : class
+        public async Task<T> Post<T>(string url, JToken data, ContentTypes? contentType = ContentTypes.JSON) where T : class
         {
             return await Request<T>(url, RequestMethods.POST, data, contentType);
         }
-        public async Task<T> Post<T>(string url, object data, ContentTypes contentType) where T : class
+        public async Task<T> Post<T>(string url, object data, ContentTypes? contentType = null) where T : class
         {
             return await Request<T>(url, RequestMethods.POST, data, contentType);
         }
-        public async Task<T> Post<T>(string url, string data, ContentTypes contentType) where T : class
+        public async Task<T> Post<T>(string url, string data, ContentTypes? contentType = null) where T : class
         {
             return await Request<T>(url, RequestMethods.POST, data, contentType);
         }
-        public async Task<T> Post<T>(string url, byte[] data, ContentTypes contentType) where T : class
+        public async Task<T> Post<T>(string url, byte[] data, ContentTypes? contentType = null) where T : class
         {
             return await Request<T>(url, RequestMethods.POST, data, contentType);
         }
@@ -121,23 +121,23 @@ namespace API
             return await Request<T>(url, RequestMethods.POST);
         }
 
-        public async Task<T> Delete<T>(string url, XDocument data, ContentTypes contentType = ContentTypes.XML) where T : class
+        public async Task<T> Delete<T>(string url, XDocument data, ContentTypes? contentType = ContentTypes.XML) where T : class
         {
             return await Request<T>(url, RequestMethods.DELETE, data, contentType);
         }
-        public async Task<T> Delete<T>(string url, JToken data, ContentTypes contentType = ContentTypes.JSON) where T : class
+        public async Task<T> Delete<T>(string url, JToken data, ContentTypes? contentType = ContentTypes.JSON) where T : class
         {
             return await Request<T>(url, RequestMethods.DELETE, data, contentType);
         }
-        public async Task<T> Delete<T>(string url, object data, ContentTypes contentType) where T : class
+        public async Task<T> Delete<T>(string url, object data, ContentTypes? contentType = null) where T : class
         {
             return await Request<T>(url, RequestMethods.DELETE, data, contentType);
         }
-        public async Task<T> Delete<T>(string url, string data, ContentTypes contentType) where T : class
+        public async Task<T> Delete<T>(string url, string data, ContentTypes? contentType = null) where T : class
         {
             return await Request<T>(url, RequestMethods.DELETE, data, contentType);
         }
-        public async Task<T> Delete<T>(string url, byte[] data, ContentTypes contentType) where T : class
+        public async Task<T> Delete<T>(string url, byte[] data, ContentTypes? contentType = null) where T : class
         {
             return await Request<T>(url, RequestMethods.DELETE, data, contentType);
         }
@@ -146,23 +146,23 @@ namespace API
             return await Request<T>(url, RequestMethods.DELETE);
         }
 
-        public async Task<T> Request<T>(string url, RequestMethods method, XDocument data, ContentTypes contentType = ContentTypes.XML) where T : class
+        public async Task<T> Request<T>(string url, RequestMethods method, XDocument data, ContentTypes? contentType = ContentTypes.XML) where T : class
         {
             return await Request<T>(url, method, data.ToString(SaveOptions.DisableFormatting), contentType);
         }
-        public async Task<T> Request<T>(string url, RequestMethods method, JToken data, ContentTypes contentType = ContentTypes.JSON) where T : class
+        public async Task<T> Request<T>(string url, RequestMethods method, JToken data, ContentTypes? contentType = ContentTypes.JSON) where T : class
         {
             return await Request<T>(url, method, data.ToString(Newtonsoft.Json.Formatting.None), contentType);
         }
-        public async Task<T> Request<T>(string url, RequestMethods method, object data, ContentTypes contentType) where T : class
+        public async Task<T> Request<T>(string url, RequestMethods method, object data, ContentTypes? contentType = null) where T : class
         {
             return await Request<T>(url, method, data?.ToString(), contentType);
         }
-        public async Task<T> Request<T>(string url, RequestMethods method, string data, ContentTypes contentType) where T : class
+        public async Task<T> Request<T>(string url, RequestMethods method, string data, ContentTypes? contentType = null) where T : class
         {
             return await Request<T>(url, method, data == null ? null : encoding.GetBytes(data), contentType);
         }
-        public async Task<T> Request<T>(string url, RequestMethods method, byte[] data, ContentTypes contentType) where T : class
+        public async Task<T> Request<T>(string url, RequestMethods method, byte[] data, ContentTypes? contentType = null) where T : class
         {
             HttpWebRequest request = await CreateRequest(url, method, data, contentType);
             return await GetResponse<T>(request);
@@ -172,23 +172,23 @@ namespace API
             return await Request<T>(url, method, new byte[0], ContentTypes.Undefined);
         }
 
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, XDocument data, ContentTypes contentType = ContentTypes.XML)
+        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, XDocument data, ContentTypes? contentType = ContentTypes.XML)
         {
             return await CreateRequest(url, method, data.ToString(SaveOptions.DisableFormatting), contentType);
         }
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, JToken data, ContentTypes contentType = ContentTypes.JSON)
+        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, JToken data, ContentTypes? contentType = ContentTypes.JSON)
         {
             return await CreateRequest(url, method, data.ToString(Newtonsoft.Json.Formatting.None), contentType);
         }
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, object data, ContentTypes contentType)
+        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, object data, ContentTypes? contentType = null)
         {
             return await CreateRequest(url, method, data?.ToString(), contentType);
         }
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, string data, ContentTypes contentType)
+        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, string data, ContentTypes? contentType = null)
         {
             return await CreateRequest(url, method, data == null ? null : encoding.GetBytes(data), contentType);
         }
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, byte[] data, ContentTypes contentType)
+        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, byte[] data, ContentTypes? contentType = null)
         {
             HttpWebRequest request = await CreateRequest(url, method);
             request.ContentType = getContentTypeString(contentType ?? defaultContentType);
