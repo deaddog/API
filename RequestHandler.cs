@@ -237,11 +237,13 @@ namespace API
                     throw new ArgumentException("Unknown request method.", nameof(method));
             }
         }
-        private static string getContentTypeString(ContentTypes type)
+        private string getContentTypeString(ContentTypes type)
         {
             switch (type)
             {
                 case ContentTypes.Undefined: return null;
+
+                case ContentTypes.Auto: return getContentTypeString(defaultContentType);
 
                 case ContentTypes.JSON: return "application/json";
                 case ContentTypes.URL_Encoded: return "application/x-www-form-urlencoded";
