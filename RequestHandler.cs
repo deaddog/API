@@ -51,7 +51,13 @@ namespace API
         public ContentTypes DefaultContentType
         {
             get { return defaultContentType; }
-            set { defaultContentType = value; }
+            set
+            {
+                if (value == ContentTypes.Auto)
+                    throw new ArgumentException($"{nameof(DefaultContentType)} cannot have the value {nameof(ContentTypes.Auto)}, cosider using {nameof(ContentTypes.Undefined)} instead.");
+
+                defaultContentType = value;
+            }
         }
 
         protected virtual Task SignIn()
