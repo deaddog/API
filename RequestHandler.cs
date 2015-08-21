@@ -171,15 +171,7 @@ namespace API
         {
             return await Request<T>(url, method, new byte[0], ContentTypes.Undefined);
         }
-
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, XDocument data, ContentTypes contentType = ContentTypes.XML)
-        {
-            return await CreateRequest(url, method, data.ToString(SaveOptions.DisableFormatting), contentType);
-        }
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, JToken data, ContentTypes contentType = ContentTypes.JSON)
-        {
-            return await CreateRequest(url, method, data.ToString(Newtonsoft.Json.Formatting.None), contentType);
-        }
+        
         public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, object data, ContentTypes contentType)
         {
             HttpWebRequest request = await CreateRequest(url, method);
@@ -217,26 +209,6 @@ namespace API
 
                 using (var stream = await request.GetRequestStreamAsync())
                     stream.Write(bytes, 0, bytes.Length);
-            }
-
-            return request;
-        }
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, string data, ContentTypes contentType)
-        {
-            return await CreateRequest(url, method, data == null ? null : encoding.GetBytes(data), contentType);
-        }
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, byte[] data, ContentTypes contentType)
-        {
-            HttpWebRequest request = await CreateRequest(url, method);
-            request.ContentType = getContentTypeString(contentType);
-
-            if (data != null && data.Length > 0)
-            {
-                if (method == RequestMethods.GET)
-                    throw new ArgumentException($"Data cannot be transferred using the {nameof(RequestMethods.GET)} method. Embed data as query string.");
-
-                using (var stream = await request.GetRequestStreamAsync())
-                    stream.Write(data, 0, data.Length);
             }
 
             return request;
