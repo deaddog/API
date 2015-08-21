@@ -51,7 +51,13 @@ namespace API
         public ContentTypes DefaultContentType
         {
             get { return defaultContentType; }
-            set { defaultContentType = value; }
+            set
+            {
+                if (value == ContentTypes.Auto)
+                    throw new ArgumentException($"{nameof(DefaultContentType)} cannot have the value {nameof(ContentTypes.Auto)}, cosider using {nameof(ContentTypes.Undefined)} instead.");
+
+                defaultContentType = value;
+            }
         }
 
         protected virtual Task SignIn()
@@ -65,29 +71,13 @@ namespace API
         protected virtual void SetCredentials(QueryValues query)
         {
         }
-        
+
         public async Task<T> Get<T>(string url) where T : class
         {
             return await Request<T>(url, RequestMethods.GET);
         }
 
-        public async Task<T> Put<T>(string url, XDocument data, ContentTypes? contentType = ContentTypes.XML) where T : class
-        {
-            return await Request<T>(url, RequestMethods.PUT, data, contentType);
-        }
-        public async Task<T> Put<T>(string url, JToken data, ContentTypes? contentType = ContentTypes.JSON) where T : class
-        {
-            return await Request<T>(url, RequestMethods.PUT, data, contentType);
-        }
-        public async Task<T> Put<T>(string url, object data, ContentTypes? contentType = null) where T : class
-        {
-            return await Request<T>(url, RequestMethods.PUT, data, contentType);
-        }
-        public async Task<T> Put<T>(string url, string data, ContentTypes? contentType = null) where T : class
-        {
-            return await Request<T>(url, RequestMethods.PUT, data, contentType);
-        }
-        public async Task<T> Put<T>(string url, byte[] data, ContentTypes? contentType = null) where T : class
+        public async Task<T> Put<T>(string url, object data, ContentTypes contentType = ContentTypes.Auto) where T : class
         {
             return await Request<T>(url, RequestMethods.PUT, data, contentType);
         }
@@ -96,23 +86,7 @@ namespace API
             return await Request<T>(url, RequestMethods.PUT);
         }
 
-        public async Task<T> Post<T>(string url, XDocument data, ContentTypes? contentType = ContentTypes.XML) where T : class
-        {
-            return await Request<T>(url, RequestMethods.POST, data, contentType);
-        }
-        public async Task<T> Post<T>(string url, JToken data, ContentTypes? contentType = ContentTypes.JSON) where T : class
-        {
-            return await Request<T>(url, RequestMethods.POST, data, contentType);
-        }
-        public async Task<T> Post<T>(string url, object data, ContentTypes? contentType = null) where T : class
-        {
-            return await Request<T>(url, RequestMethods.POST, data, contentType);
-        }
-        public async Task<T> Post<T>(string url, string data, ContentTypes? contentType = null) where T : class
-        {
-            return await Request<T>(url, RequestMethods.POST, data, contentType);
-        }
-        public async Task<T> Post<T>(string url, byte[] data, ContentTypes? contentType = null) where T : class
+        public async Task<T> Post<T>(string url, object data, ContentTypes contentType = ContentTypes.Auto) where T : class
         {
             return await Request<T>(url, RequestMethods.POST, data, contentType);
         }
@@ -121,23 +95,7 @@ namespace API
             return await Request<T>(url, RequestMethods.POST);
         }
 
-        public async Task<T> Delete<T>(string url, XDocument data, ContentTypes? contentType = ContentTypes.XML) where T : class
-        {
-            return await Request<T>(url, RequestMethods.DELETE, data, contentType);
-        }
-        public async Task<T> Delete<T>(string url, JToken data, ContentTypes? contentType = ContentTypes.JSON) where T : class
-        {
-            return await Request<T>(url, RequestMethods.DELETE, data, contentType);
-        }
-        public async Task<T> Delete<T>(string url, object data, ContentTypes? contentType = null) where T : class
-        {
-            return await Request<T>(url, RequestMethods.DELETE, data, contentType);
-        }
-        public async Task<T> Delete<T>(string url, string data, ContentTypes? contentType = null) where T : class
-        {
-            return await Request<T>(url, RequestMethods.DELETE, data, contentType);
-        }
-        public async Task<T> Delete<T>(string url, byte[] data, ContentTypes? contentType = null) where T : class
+        public async Task<T> Delete<T>(string url, object data, ContentTypes contentType = ContentTypes.Auto) where T : class
         {
             return await Request<T>(url, RequestMethods.DELETE, data, contentType);
         }
@@ -146,23 +104,7 @@ namespace API
             return await Request<T>(url, RequestMethods.DELETE);
         }
 
-        public async Task<T> Request<T>(string url, RequestMethods method, XDocument data, ContentTypes? contentType = ContentTypes.XML) where T : class
-        {
-            return await Request<T>(url, method, data.ToString(SaveOptions.DisableFormatting), contentType);
-        }
-        public async Task<T> Request<T>(string url, RequestMethods method, JToken data, ContentTypes? contentType = ContentTypes.JSON) where T : class
-        {
-            return await Request<T>(url, method, data.ToString(Newtonsoft.Json.Formatting.None), contentType);
-        }
-        public async Task<T> Request<T>(string url, RequestMethods method, object data, ContentTypes? contentType = null) where T : class
-        {
-            return await Request<T>(url, method, data?.ToString(), contentType);
-        }
-        public async Task<T> Request<T>(string url, RequestMethods method, string data, ContentTypes? contentType = null) where T : class
-        {
-            return await Request<T>(url, method, data == null ? null : encoding.GetBytes(data), contentType);
-        }
-        public async Task<T> Request<T>(string url, RequestMethods method, byte[] data, ContentTypes? contentType = null) where T : class
+        public async Task<T> Request<T>(string url, RequestMethods method, object data, ContentTypes contentType = ContentTypes.Auto) where T : class
         {
             HttpWebRequest request = await CreateRequest(url, method, data, contentType);
             return await GetResponse<T>(request);
@@ -172,34 +114,43 @@ namespace API
             return await Request<T>(url, method, new byte[0], ContentTypes.Undefined);
         }
 
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, XDocument data, ContentTypes? contentType = ContentTypes.XML)
-        {
-            return await CreateRequest(url, method, data.ToString(SaveOptions.DisableFormatting), contentType);
-        }
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, JToken data, ContentTypes? contentType = ContentTypes.JSON)
-        {
-            return await CreateRequest(url, method, data.ToString(Newtonsoft.Json.Formatting.None), contentType);
-        }
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, object data, ContentTypes? contentType = null)
-        {
-            return await CreateRequest(url, method, data?.ToString(), contentType);
-        }
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, string data, ContentTypes? contentType = null)
-        {
-            return await CreateRequest(url, method, data == null ? null : encoding.GetBytes(data), contentType);
-        }
-        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, byte[] data, ContentTypes? contentType = null)
+        public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, object data, ContentTypes contentType = ContentTypes.Auto)
         {
             HttpWebRequest request = await CreateRequest(url, method);
-            request.ContentType = getContentTypeString(contentType ?? defaultContentType);
+            request.ContentType = getContentTypeString(contentType);
 
-            if (data != null && data.Length > 0)
+            byte[] bytes;
+
+            if (data == null || data is byte[])
+                bytes = (byte[])data;
+            else
+            {
+                string str;
+                if (data is XContainer)
+                {
+                    str = (data as XContainer).ToString(SaveOptions.DisableFormatting);
+                    if (contentType == ContentTypes.Auto)
+                        contentType = ContentTypes.XML;
+                }
+                else if (data is JToken)
+                {
+                    str = (data as JToken).ToString(Newtonsoft.Json.Formatting.None);
+                    if (contentType == ContentTypes.Auto)
+                        contentType = ContentTypes.JSON;
+                }
+                else
+                    str = data.ToString();
+
+                bytes = encoding.GetBytes(str);
+            }
+
+            if (bytes != null && bytes.Length > 0)
             {
                 if (method == RequestMethods.GET)
                     throw new ArgumentException($"Data cannot be transferred using the {nameof(RequestMethods.GET)} method. Embed data as query string.");
 
                 using (var stream = await request.GetRequestStreamAsync())
-                    stream.Write(data, 0, data.Length);
+                    stream.Write(bytes, 0, bytes.Length);
             }
 
             return request;
@@ -261,38 +212,21 @@ namespace API
             if (typeof(T) == typeof(byte[]))
                 return data as T;
 
-            string response_str = (data == null || data.Length == 0) ? null : encoding.GetString(data);
+            if (data == null || data.Length == 0)
+                return null;
+
+            string response_str = encoding.GetString(data);
 
             if (typeof(T) == typeof(string))
                 return response_str as T;
             else if (typeof(T) == typeof(JToken))
-            {
-                if (response_str != null)
-                    return JToken.Parse(response_str) as T;
-                else
-                    return null;
-            }
+                return JToken.Parse(response_str) as T;
             else if (typeof(T) == typeof(JArray))
-            {
-                if (response_str != null)
-                    return JArray.Parse(response_str) as T;
-                else
-                    return null;
-            }
+                return JArray.Parse(response_str) as T;
             else if (typeof(T) == typeof(JObject))
-            {
-                if (response_str != null)
-                    return JObject.Parse(response_str) as T;
-                else
-                    return null;
-            }
+                return JObject.Parse(response_str) as T;
             else if (typeof(T) == typeof(XDocument))
-            {
-                if (response_str != null)
-                    return XDocument.Parse(response_str) as T;
-                else
-                    return null;
-            }
+                return XDocument.Parse(response_str) as T;
             else
                 throw new InvalidOperationException($"{nameof(GetResponse)} does not support objects of type {typeof(T).Name}.");
         }
@@ -309,11 +243,13 @@ namespace API
                     throw new ArgumentException("Unknown request method.", nameof(method));
             }
         }
-        private static string getContentTypeString(ContentTypes type)
+        private string getContentTypeString(ContentTypes type)
         {
             switch (type)
             {
                 case ContentTypes.Undefined: return null;
+
+                case ContentTypes.Auto: return getContentTypeString(defaultContentType);
 
                 case ContentTypes.JSON: return "application/json";
                 case ContentTypes.URL_Encoded: return "application/x-www-form-urlencoded";

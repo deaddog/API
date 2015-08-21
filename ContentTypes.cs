@@ -9,6 +9,7 @@ namespace API
     public enum ContentTypes
     {
         Undefined,
+        Auto,
         JSON,
         XML,
         URL_Encoded
