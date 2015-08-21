@@ -72,11 +72,23 @@ namespace API
         {
         }
 
+        public async Task Get(string url)
+        {
+            await Request(url, RequestMethods.GET);
+        }
         public async Task<T> Get<T>(string url) where T : class
         {
             return await Request<T>(url, RequestMethods.GET);
         }
 
+        public async Task Put(string url, object data, ContentTypes contentType = ContentTypes.Auto)
+        {
+            await Request(url, RequestMethods.PUT, data, contentType);
+        }
+        public async Task Put(string url)
+        {
+            await Request(url, RequestMethods.PUT);
+        }
         public async Task<T> Put<T>(string url, object data, ContentTypes contentType = ContentTypes.Auto) where T : class
         {
             return await Request<T>(url, RequestMethods.PUT, data, contentType);
@@ -86,6 +98,14 @@ namespace API
             return await Request<T>(url, RequestMethods.PUT);
         }
 
+        public async Task Post(string url, object data, ContentTypes contentType = ContentTypes.Auto)
+        {
+            await Request(url, RequestMethods.POST, data, contentType);
+        }
+        public async Task Post(string url)
+        {
+            await Request(url, RequestMethods.POST);
+        }
         public async Task<T> Post<T>(string url, object data, ContentTypes contentType = ContentTypes.Auto) where T : class
         {
             return await Request<T>(url, RequestMethods.POST, data, contentType);
@@ -95,6 +115,14 @@ namespace API
             return await Request<T>(url, RequestMethods.POST);
         }
 
+        public async Task Delete(string url, object data, ContentTypes contentType = ContentTypes.Auto)
+        {
+            await Request(url, RequestMethods.DELETE, data, contentType);
+        }
+        public async Task Delete(string url)
+        {
+            await Request(url, RequestMethods.DELETE);
+        }
         public async Task<T> Delete<T>(string url, object data, ContentTypes contentType = ContentTypes.Auto) where T : class
         {
             return await Request<T>(url, RequestMethods.DELETE, data, contentType);
@@ -104,6 +132,15 @@ namespace API
             return await Request<T>(url, RequestMethods.DELETE);
         }
 
+        public async Task Request(string url, RequestMethods method, object data, ContentTypes contentType = ContentTypes.Auto)
+        {
+            HttpWebRequest request = await CreateRequest(url, method, data, contentType);
+            await GetResponse(request);
+        }
+        public async Task Request(string url, RequestMethods method)
+        {
+            await Request(url, method, new byte[0], ContentTypes.Undefined);
+        }
         public async Task<T> Request<T>(string url, RequestMethods method, object data, ContentTypes contentType = ContentTypes.Auto) where T : class
         {
             HttpWebRequest request = await CreateRequest(url, method, data, contentType);
@@ -200,6 +237,11 @@ namespace API
             return url;
         }
 
+        public async Task GetResponse(HttpWebRequest request)
+        {
+            var response = await request.GetResponseAsync();
+            response.Dispose();
+        }
         public async Task<T> GetResponse<T>(HttpWebRequest request) where T : class
         {
             using (HttpWebResponse response = await request.GetResponseAsync() as HttpWebResponse)
