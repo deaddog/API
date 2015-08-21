@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Xml.Linq;
 
 namespace API
@@ -59,6 +60,9 @@ namespace API
         }
 
         protected virtual void SetCredentials(HttpWebRequest request)
+        {
+        }
+        protected virtual void SetCredentials(QueryValues query)
         {
         }
         
@@ -216,11 +220,33 @@ namespace API
                 signingIn = false;
             }
 
+            if (signedIn)
+                url = applyCredentialsQuery(url);
+
             HttpWebRequest request = HttpWebRequest.CreateHttp(rootURL + url);
             if (signedIn)
                 SetCredentials(request);
 
             return request;
+        }
+
+        private string applyCredentialsQuery(string url)
+        {
+            QueryValues values = new QueryValues();
+            SetCredentials(values);
+            return applyQuery(url, values);
+        }
+        private string applyQuery(string url, QueryValues values)
+        {
+            if (values.Count == 0)
+                return url;
+
+            url += url.Contains("?") ? "&" : "?";
+            url += $"{values[0].Key}={values[0].Value}";
+            for (int i = 1; i < values.Count; i++)
+                url += $"&{values[i].Key}={values[1].Value}";
+
+            return url;
         }
 
         public async Task<T> GetResponse<T>(HttpWebRequest request) where T : class
@@ -311,6 +337,36 @@ namespace API
                 throw new WebException((response as HttpWebResponse).StatusDescription);
 
             return responseBuffer;
+        }
+
+        public class QueryValues
+        {
+            private List<KeyValuePair<string, string>> list;
+
+            public QueryValues()
+            {
+                list = new List<KeyValuePair<string, string>>();
+            }
+
+            public void Add(string key, string value, bool encode = true)
+            {
+                if (encode)
+                {
+                    key = HttpUtility.UrlEncode(key);
+                    value = HttpUtility.UrlEncode(value);
+                }
+
+                list.Add(new KeyValuePair<string, string>(key, value));
+            }
+
+            public int Count
+            {
+                get { return list.Count; }
+            }
+            public KeyValuePair<string, string> this[int index]
+            {
+                get { return list[index]; }
+            }
         }
     }
 }
