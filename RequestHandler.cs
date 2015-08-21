@@ -61,27 +61,7 @@ namespace API
         protected virtual void SetCredentials(HttpWebRequest request)
         {
         }
-
-        public async Task<T> Get<T>(string url, XDocument data, ContentTypes contentType = ContentTypes.XML) where T : class
-        {
-            return await Request<T>(url, RequestMethods.GET, data, contentType);
-        }
-        public async Task<T> Get<T>(string url, JToken data, ContentTypes contentType = ContentTypes.JSON) where T : class
-        {
-            return await Request<T>(url, RequestMethods.GET, data, contentType);
-        }
-        public async Task<T> Get<T>(string url, object data, ContentTypes contentType) where T : class
-        {
-            return await Request<T>(url, RequestMethods.GET, data, contentType);
-        }
-        public async Task<T> Get<T>(string url, string data, ContentTypes contentType) where T : class
-        {
-            return await Request<T>(url, RequestMethods.GET, data, contentType);
-        }
-        public async Task<T> Get<T>(string url, byte[] data, ContentTypes contentType) where T : class
-        {
-            return await Request<T>(url, RequestMethods.GET, data, contentType);
-        }
+        
         public async Task<T> Get<T>(string url) where T : class
         {
             return await Request<T>(url, RequestMethods.GET);
