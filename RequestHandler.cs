@@ -206,38 +206,21 @@ namespace API
             if (typeof(T) == typeof(byte[]))
                 return data as T;
 
-            string response_str = (data == null || data.Length == 0) ? null : encoding.GetString(data);
+            if (data == null || data.Length == 0)
+                return null;
+
+            string response_str = encoding.GetString(data);
 
             if (typeof(T) == typeof(string))
                 return response_str as T;
             else if (typeof(T) == typeof(JToken))
-            {
-                if (response_str != null)
-                    return JToken.Parse(response_str) as T;
-                else
-                    return null;
-            }
+                return JToken.Parse(response_str) as T;
             else if (typeof(T) == typeof(JArray))
-            {
-                if (response_str != null)
-                    return JArray.Parse(response_str) as T;
-                else
-                    return null;
-            }
+                return JArray.Parse(response_str) as T;
             else if (typeof(T) == typeof(JObject))
-            {
-                if (response_str != null)
-                    return JObject.Parse(response_str) as T;
-                else
-                    return null;
-            }
+                return JObject.Parse(response_str) as T;
             else if (typeof(T) == typeof(XDocument))
-            {
-                if (response_str != null)
-                    return XDocument.Parse(response_str) as T;
-                else
-                    return null;
-            }
+                return XDocument.Parse(response_str) as T;
             else
                 throw new InvalidOperationException($"{nameof(GetResponse)} does not support objects of type {typeof(T).Name}.");
         }
