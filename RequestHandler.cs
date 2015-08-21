@@ -104,6 +104,15 @@ namespace API
             return await Request<T>(url, RequestMethods.DELETE);
         }
 
+        public async Task Request(string url, RequestMethods method, object data, ContentTypes contentType = ContentTypes.Auto)
+        {
+            HttpWebRequest request = await CreateRequest(url, method, data, contentType);
+            await GetResponse(request);
+        }
+        public async Task Request(string url, RequestMethods method)
+        {
+            await Request(url, method, new byte[0], ContentTypes.Undefined);
+        }
         public async Task<T> Request<T>(string url, RequestMethods method, object data, ContentTypes contentType = ContentTypes.Auto) where T : class
         {
             HttpWebRequest request = await CreateRequest(url, method, data, contentType);
