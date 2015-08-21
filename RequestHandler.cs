@@ -14,7 +14,7 @@ namespace API
     {
         private readonly string rootURL;
         private Encoding encoding;
-        private ContentTypes contentType;
+        private ContentTypes defaultContentType;
 
         private bool signedIn, signingIn;
 
@@ -31,7 +31,7 @@ namespace API
 
             this.rootURL = rootURL.TrimEnd('/');
             this.encoding = encoding;
-            this.contentType = ContentTypes.Undefined;
+            this.defaultContentType = ContentTypes.Undefined;
 
             this.signingIn = false;
             this.signedIn = false;
@@ -50,8 +50,8 @@ namespace API
         }
         public ContentTypes DefaultContentType
         {
-            get { return contentType; }
-            set { contentType = value; }
+            get { return defaultContentType; }
+            set { defaultContentType = value; }
         }
 
         protected virtual Task SignIn()
@@ -191,7 +191,7 @@ namespace API
         public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, byte[] data, ContentTypes contentType)
         {
             HttpWebRequest request = await CreateRequest(url, method);
-            request.ContentType = getContentTypeString(contentType);
+            request.ContentType = getContentTypeString(contentType ?? defaultContentType);
 
             if (data != null && data.Length > 0)
             {
