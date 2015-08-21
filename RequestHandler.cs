@@ -200,6 +200,11 @@ namespace API
             return url;
         }
 
+        public async Task GetResponse(HttpWebRequest request)
+        {
+            var response = await request.GetResponseAsync();
+            response.Dispose();
+        }
         public async Task<T> GetResponse<T>(HttpWebRequest request) where T : class
         {
             using (HttpWebResponse response = await request.GetResponseAsync() as HttpWebResponse)
