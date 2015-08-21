@@ -65,7 +65,7 @@ namespace API
         protected virtual void SetCredentials(QueryValues query)
         {
         }
-        
+
         public async Task<T> Get<T>(string url) where T : class
         {
             return await Request<T>(url, RequestMethods.GET);
@@ -182,7 +182,44 @@ namespace API
         }
         public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, object data, ContentTypes contentType)
         {
-            return await CreateRequest(url, method, data?.ToString(), contentType);
+            HttpWebRequest request = await CreateRequest(url, method);
+            request.ContentType = getContentTypeString(contentType);
+
+            byte[] bytes;
+
+            if (data == null || data is byte[])
+                bytes = (byte[])data;
+            else
+            {
+                string str;
+                if (data is XContainer)
+                {
+                    str = (data as XContainer).ToString(SaveOptions.DisableFormatting);
+                    if (contentType == ContentTypes.Auto)
+                        contentType = ContentTypes.XML;
+                }
+                else if (data is JToken)
+                {
+                    str = (data as JToken).ToString(Newtonsoft.Json.Formatting.None);
+                    if (contentType == ContentTypes.Auto)
+                        contentType = ContentTypes.JSON;
+                }
+                else
+                    str = data.ToString();
+
+                bytes = encoding.GetBytes(str);
+            }
+
+            if (bytes != null && bytes.Length > 0)
+            {
+                if (method == RequestMethods.GET)
+                    throw new ArgumentException($"Data cannot be transferred using the {nameof(RequestMethods.GET)} method. Embed data as query string.");
+
+                using (var stream = await request.GetRequestStreamAsync())
+                    stream.Write(bytes, 0, bytes.Length);
+            }
+
+            return request;
         }
         public async Task<HttpWebRequest> CreateRequest(string url, RequestMethods method, string data, ContentTypes contentType)
         {
